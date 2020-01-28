@@ -1,0 +1,15 @@
+PORT=3000
+
+ENVIRONMENT_MODE='Nexmo'
+CLIENT_ID_SB='fc8ba588'
+CLIENT_SECRET_SB='lbikomM9aonOYCN9'
+
+USERNAME_SB=YourSandboxUsername
+PASSWORD_SB=YourSandboxPassword
+EXTENSION=
+
+CLIENT_ID_PROD=YourProductionClientID
+CLIENT_SECRET_PROD=YourProductionClientSecret
+
+USERNAME_PROD=YourProductionUsername
+PASSWORD_PROD=YourProductionPassword
