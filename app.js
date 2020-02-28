@@ -26,10 +26,10 @@ var api = require('instagram-node').instagram();
 var InstagramTokenStrategy = require('passport-instagram-token');
 var passport = require('passport');
 var Twitter = require('twitter');
-const fixer = require("fixer-api");
-// app.use(passport.initialize());
-// app.use(passport.session());
-
+const http = require('http');
+const url = require('url');
+const FixerIO = require('fixer-io-utility');
+const fixerUtility = new FixerIO('e9ecddb829ad080aba96a3e37ccb2e62');
 var ig = require('instagram-node').instagram();
 // CONFIGURE THE APP
 // ==================================================
@@ -38,8 +38,6 @@ var ig = require('instagram-node').instagram();
 ig.use({
 access_token: '17060382689.b498e36.d683b38bd4434af29f1648f5131bacf5',
 });
-
-fixer.set({ accessKey: 'e9ecddb829ad080aba96a3e37ccb2e62' });
 
 // configure twitter app with your key
 config = {
@@ -91,18 +89,17 @@ const nexmo = new Nexmo({
   apiKey: NEXMO_API_KEY,
   apiSecret: NEXMO_API_SECRET
 });
+console.log('fixerUtility'); 
 
+var currencyrate={};
+fixerUtility.request('latest').then((response) => {
+  console.log('dfsfdfd');
+  console.log(response);
+  currencyrate=response;
+});
 
 // Web UI ("Registration Form")
 app.get('/',async (req, res) => {  
-//   const data = await fixer.latest();
-// console.log(data);
- 
-/**
- *  or, if you want to specify access key per request (note it's in snake_case here)
- */
-// const datas = await fixer.latest({ access_key: 'e9ecddb829ad080aba96a3e37ccb2e62'});
-// console.log('fixer-api '+datas);
   res.render('index');
 });
 
@@ -133,6 +130,9 @@ Twit.get('search/tweets', params, function(err, data, response) {
   }
 })
 
+app.get('/twitter', function(req, res) {
+  res.render('twitter');
+  });
 
 // home page route - our profile's images
 app.get('/instagram', function(req, res) {
@@ -142,6 +142,10 @@ app.get('/instagram', function(req, res) {
   res.render('pages/index', { grams: medias });
   });
   });
+
+  app.get('/currency', function(req, res) {
+    res.render('currency');
+    });
 
 // app.get('/dashboard', (req, res) => {
 //   res.render('dashboard');
@@ -298,6 +302,7 @@ app.post('/verify', (req, res) => {
       });
     } else {
       console.log(result);
+      console.log('currencyrate'+ currencyrate);
       // Error status code: https://developer.nexmo.com/api/verify#verify-check
       if (result && result.status == '0') {
         //res.status(200).send('Account verified!');
@@ -305,7 +310,8 @@ app.post('/verify', (req, res) => {
         //   message: 'Account verified! 🎉'
         // });
         res.render('dashboard', {
-          message: result.error_text
+          message: result.error_text,
+          currencyrate:currencyrate
         });
 
         //res.redirect('dashboard')
