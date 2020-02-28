@@ -6,5 +6,5 @@
 
 <p align="center">
   <img src="/Instagram.png" width="450">
-  <img src="/Currency" width="450">
+  <img src="/Currency.png" width="450">
 </p>
