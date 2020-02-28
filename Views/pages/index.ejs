@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My First Instagram App!</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css">
+    <link rel="stylesheet" href="css/insta.css">
+
+</head>
+<body class="container">
+<header>
+    <nav class="navbar navbar-inverse"> <div class="container-fluid">
+        <div class="navbar-header">
+        <a href="/" class="navbar-brand">
+        <span class="glyphicon glyphicon-picture">
+        </span>
+        My Instagram Photos @Ela
+        </a>
+        </div> </div>
+        </nav>
+        
+
+</header>
+<br>
+<br>
+<main>
+<div class="row">
+<% grams.forEach(function(gram) { %>
+  <div class="instagram-pic col-sm-3">
+
+<a href="<%= gram.link %>" target="_blank">
+<img src="<%= gram.images.standard_resolution.url %>" class="img-
+responsive" width="100%">
+</a>
+
+<div class="instagram-bar">
+  <div class="likes">
+<span class="glyphicon glyphicon-heart"></span>
+<%= gram.likes.count %> </div>
+
+<div class="comments">
+<span class="glyphicon glyphicon-comment"></span>
+<%= gram.comments.count %>
+</div>
+</div>
+
+</div>
+<% }); %>
+</div>
+</main>
+<footer>
+    <p class="text-center text-muted">
+        Copyright &copy; 2018 &middot; Instagram feed - Node.js application
+        </p>
+        
+
+</footer>
+</body>
+</html>

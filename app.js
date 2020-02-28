@@ -22,6 +22,40 @@ const expressValidator = require('express-validator');
 const mongoose = require('mongoose');
 var expressMongoDb = require('express-mongo-db');
 var User = require('./models/user');
+var api = require('instagram-node').instagram();
+var InstagramTokenStrategy = require('passport-instagram-token');
+var passport = require('passport');
+var Twitter = require('twitter');
+const fixer = require("fixer-api");
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+var ig = require('instagram-node').instagram();
+// CONFIGURE THE APP
+// ==================================================
+
+// configure instagram app with your access_token
+ig.use({
+access_token: '17060382689.b498e36.d683b38bd4434af29f1648f5131bacf5',
+});
+
+fixer.set({ accessKey: 'e9ecddb829ad080aba96a3e37ccb2e62' });
+
+// configure twitter app with your key
+config = {
+  consumer_key: '',
+  consumer_secret: '',
+  access_token_key: '',
+  access_token_secret: ''
+}
+var Twit = new Twitter(config);
+
+var params = {
+  q: '#nodejs',
+  count: 10,
+  result_type: 'recent',
+  lang: 'en'
+}
 
 app.use(bodyParser.json()); // for parsing POST req
 app.use(bodyParser.urlencoded({
@@ -39,7 +73,7 @@ db.once('open', function () {
 });
 
 app.set('views', __dirname + '/views'); // Render on browser
-app.set('view engine', 'html');
+app.set('view engine', 'ejs');
 app.engine('html', ejs.renderFile);
 app.use(express.static(__dirname + '/views'));
 
@@ -48,8 +82,8 @@ const server = app.listen(process.env.PORT || 5000, () => {
 });
 
 const BRAND_NAME = 'Nexmo';
-const NEXMO_API_KEY = 'fc8ba588';
-const NEXMO_API_SECRET = 'lbikomM9aonOYCN9';
+const NEXMO_API_KEY = 'f45dddfd';
+const NEXMO_API_SECRET = '8R345je4m0iJBGfl';
 
 const Nexmo = require('nexmo');
 
@@ -58,14 +92,60 @@ const nexmo = new Nexmo({
   apiSecret: NEXMO_API_SECRET
 });
 
+
 // Web UI ("Registration Form")
-app.get('/', (req, res) => {
+app.get('/',async (req, res) => {  
+//   const data = await fixer.latest();
+// console.log(data);
+ 
+/**
+ *  or, if you want to specify access key per request (note it's in snake_case here)
+ */
+// const datas = await fixer.latest({ access_key: 'e9ecddb829ad080aba96a3e37ccb2e62'});
+// console.log('fixer-api '+datas);
   res.render('index');
 });
 
-app.get('/dashboard', (req, res) => {
-  res.render('dashboard');
-});
+// Initiate your search using the above paramaters
+Twit.get('search/tweets', params, function(err, data, response) {
+  // If there is no error, proceed
+  if(!err){
+    // Loop through the returned tweets
+    for(let i = 0; i < data.statuses.length; i++){
+      // Get the tweet Id from the returned data
+      let id = { id: data.statuses[i].id_str }
+      // Try to Favorite the selected Tweet
+      Twit.post('favorites/create', id, function(err, response){
+        // If the favorite fails, log the error message
+        if(err){
+          console.log(err[0].message);
+        }
+        // If the favorite is successful, log the url of the tweet
+        else{
+          let username = response.user.screen_name;
+          let tweetId = response.id_str;
+          console.log('Favorited: ', `https://twitter.com/${username}/status/${tweetId}`)
+        }
+      });
+    }
+  } else {
+    console.log(err);
+  }
+})
+
+
+// home page route - our profile's images
+app.get('/instagram', function(req, res) {
+  // use the instagram package to get our profile's media
+  ig.user_self_media_recent(function(err, medias, pagination, remaining, limit) {
+  // render the home page and pass in our profile's images
+  res.render('pages/index', { grams: medias });
+  });
+  });
+
+// app.get('/dashboard', (req, res) => {
+//   res.render('dashboard');
+// });
 
 
 app.post('/register', (req, res) => {
@@ -224,7 +304,11 @@ app.post('/verify', (req, res) => {
         // res.render('status', {
         //   message: 'Account verified! 🎉'
         // });
-        res.redirect('/dashboard')
+        res.render('dashboard', {
+          message: result.error_text
+        });
+
+        //res.redirect('dashboard')
       } else {
         //res.status(401).send(result.error_text);
         res.render('status', {

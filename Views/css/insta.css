@@ -1,0 +1,52 @@
+
+.instagram-pic {
+    position: sticky;
+    padding:10px;
+    overflow:hidden;
+  }
+  
+  .instagram-pic img {
+  padding:5px;
+  border-radius:21px;
+  box-shadow:0 0 5px rgba(0, 0, 0, 0.5);
+  border-color: pink;
+  }
+  
+  .instagram-bar {
+  position:absolute;
+  bottom:30px;
+  width:100%;
+  left:0;
+  padding-left:30px;
+  padding-right:30px;
+  color:#FFF;
+  }
+  
+  .instagram-bar span {
+    margin-right:5px;
+  }
+  
+  .instagram-bar .likes {
+  float:left;
+  }
+  
+  .instagram-bar .comments {
+    float:right;
+  }
+  
+  .navbar-header {
+    background-color: pink;
+    color: black;
+    border-color: pink;
+    font-weight: bolder;
+  }
+  
+  .container-fluid {
+      margin-right: auto;
+      margin-left: auto;
+      padding-left: 15px;
+      padding-right: 15px;
+      background-color: pink;
+      border-color: pink;
+  }
+  
