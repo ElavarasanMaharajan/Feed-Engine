@@ -4,8 +4,7 @@
 2.Currency Convertor
 3.Twitter
 
-
 <p align="center">
-  <img src="" width="350" title="hover text">
-  <img src="" width="350" alt="accessibility text">
+  <img src="/Instagram.png" width="450">
+  <img src="/Currency" width="450">
 </p>
