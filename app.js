@@ -33,23 +33,24 @@ const fixerUtility = new FixerIO('e9ecddb829ad080aba96a3e37ccb2e62');
 var ig = require('instagram-node').instagram();
 // CONFIGURE THE APP
 // ==================================================
-
+var config = require('./config')
 // configure instagram app with your access_token
 ig.use({
-access_token: '17060382689.b498e36.d683b38bd4434af29f1648f5131bacf5',
+access_token: config.database.access_token,
 });
 
+app.use(expressMongoDb(config.database.url));
 // configure twitter app with your key
 config = {
-  consumer_key: '',
-  consumer_secret: '',
-  access_token_key: '',
-  access_token_secret: ''
+  consumer_key:config.database.consumer_key,
+  consumer_secret: config.database.consumer_secret,
+  access_token_key: config.database.access_token_key,
+  access_token_secret: config.database.access_token_secret
 }
 var Twit = new Twitter(config);
 
 var params = {
-  q: '#nodejs',
+  q: '@narendramodi',
   count: 10,
   result_type: 'recent',
   lang: 'en'
@@ -60,8 +61,7 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(expressValidator());
-var config = require('./config')
-app.use(expressMongoDb(config.database.url));
+
 
 mongoose.connect('mongodb://localhost:27017/engine', {  useNewUrlParser: true });
 
@@ -79,7 +79,7 @@ const server = app.listen(process.env.PORT || 5000, () => {
   console.log('Express server listening on port %d in %s mode', server.address().port, app.settings.env);
 });
 
-const BRAND_NAME = 'Nexmo';
+const BRAND_NAME =  'Nexmo';
 const NEXMO_API_KEY = 'f45dddfd';
 const NEXMO_API_SECRET = '8R345je4m0iJBGfl';
 
@@ -103,34 +103,67 @@ app.get('/',async (req, res) => {
   res.render('index');
 });
 
-// Initiate your search using the above paramaters
-Twit.get('search/tweets', params, function(err, data, response) {
-  // If there is no error, proceed
-  if(!err){
-    // Loop through the returned tweets
-    for(let i = 0; i < data.statuses.length; i++){
-      // Get the tweet Id from the returned data
-      let id = { id: data.statuses[i].id_str }
-      // Try to Favorite the selected Tweet
-      Twit.post('favorites/create', id, function(err, response){
-        // If the favorite fails, log the error message
-        if(err){
-          console.log(err[0].message);
-        }
-        // If the favorite is successful, log the url of the tweet
-        else{
-          let username = response.user.screen_name;
-          let tweetId = response.id_str;
-          console.log('Favorited: ', `https://twitter.com/${username}/status/${tweetId}`)
-        }
-      });
-    }
-  } else {
-    console.log(err);
-  }
-})
 
+var retweet = function() {
+  // for more parameters, see: https://dev.twitter.com/rest/reference/get/search/tweets
+
+  Twit.get('search/tweets', params, function(err, data) {
+    // if there no errors
+    console.log(data);
+      if (!err) {
+        // grab ID of tweet to retweet
+          var retweetId = data.statuses[0].id_str;
+          // Tell TWITTER to retweet
+          Twit.post('statuses/retweet/:id', {
+              id: retweetId
+          }, function(err, response) {
+              if (response) {
+                  console.log('Retweeted!!!');
+              }
+              // if there was an error while tweeting
+              if (err) {
+                  console.log('Something went wrong while RETWEETING... Duplication maybe...');
+              }
+          });
+      }
+      // if unable to Search a tweet
+      else {
+        console.log('Something went wrong while SEARCHING...');
+      }
+  });
+}
+
+app.post('/twitregister', function(req, res) {
+
+  console.log(req.body.twit)
+    Twit.post("statuses/update", { status: req.body.twit}, function(error, tweet, response) {
+      if (error) {
+        console.log(error)
+      } else {
+        res.render('twitter');
+        console.log(tweet)
+      }
+    })
+
+});
+
+    
 app.get('/twitter', function(req, res) {
+
+
+//   Twit.get('search/tweets', {q: '#ios #swift'}, function(error, tweets, response) {
+//     tweets.statuses.forEach(function(tweet) {
+//       console.log("tweet: " + tweet.text)
+//     });
+//  });
+  // Twit.post("statuses/update", { status: "I tweeted from Node.js!" }, function(error, tweet, response) {
+  //   if (error) {
+  //     console.log(error)
+  //   } else {
+  //     console.log(tweet)
+  //   }
+  // })
+  // retweet();
   res.render('twitter');
   });
 

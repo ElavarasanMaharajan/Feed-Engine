@@ -10,12 +10,18 @@
  */ 
 var config = {
 	database: {
-		url: 'mongodb://localhost:27017/engine'
+		url: 'mongodb://localhost:27017/engine',
+		access_token: '',		
+		consumer_key: '',
+		consumer_secret: '',
+		access_token_key: '',
+		access_token_secret: ''
 	},
 	server: {
 		host: '127.0.0.1',
 		port: '3000'
 	}
+
 }
 
 module.exports = config
